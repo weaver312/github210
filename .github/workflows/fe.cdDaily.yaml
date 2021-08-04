@@ -26,11 +26,11 @@ on:
       need_package_json:
         description: 'if project need package.json'
         required: true
-        default: 'FALSE'
+        default: 'false'
       compile_command:
         description: 'code compile command'
         required: true
-        default: 'TRUE'
+        default: 'true'
 
 jobs:
   pre-check:
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: check package.json
-        run: ! ${{github.event.inputs.need_package_json}} || ( test -f ./package.json && exit 0 || (echo 'package.json is not exist!' && exit 1) )
+        run: ${{github.event.inputs.need_package_json}} && ( test -f ./package.json && exit 0 || (echo 'package.json is not exist!' && exit 1) )
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -57,10 +57,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: install deps
-        run: ! ${{github.event.inputs.need_package_json}} || npm install --registry https://registry.npm.taobao.org/
+        run: ${{github.event.inputs.need_package_json}} && npm install --registry https://registry.npm.taobao.org/
 
       - name: build
-        run: ! ${{github.event.inputs.need_package_json}} || ${{github.event.inputs.compile_command}}
+        run: ${{github.event.inputs.need_package_json}} && ${{github.event.inputs.compile_command}}
 
       - name: deploy
         id: upload_to_oss
